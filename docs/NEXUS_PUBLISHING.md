@@ -80,4 +80,4 @@ The Ko-fi support paragraph is adapted from the author's BB Tools support inform
 
 ## Publication scope
 
-The source push is authorized. This preparation does not create or publish a Nexus listing, upload archives to Nexus, or create a GitHub release. The two local mod-manager archives are ready for manual Nexus upload.
+The source push is authorized. This preparation does not create or publish a Nexus listing, upload archives to Nexus, or publish the Nexus page. Prebuilt archives are also published separately through GitHub Releases at the author's request. The same two mod-manager archives are ready for manual Nexus upload.
