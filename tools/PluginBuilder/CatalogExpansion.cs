@@ -191,7 +191,7 @@ EndFunction
         var responses = read.DialogTopics.Single().Responses;
         Check(responses.Count == 3 + expansion.AddedResponses, "All eleven merchants have order dialogue");
         var expected = expansion.Merchants.Select(m => m.Npc).ToHashSet();
-        var actual = responses.Select(r => ((IGetIsIDConditionDataGetter)r.Conditions.Single().Data).Object.Link.FormKey).ToHashSet();
+        var actual = responses.Where(r => r.EditorID != "MO_DynamicResponse").Select(r => ((IGetIsIDConditionDataGetter)r.Conditions.Single().Data).Object.Link.FormKey).ToHashSet();
         Check(actual.SetEquals(expected), "Dialogue eligibility matches the explicit merchant allowlist");
         Check(responses.All(r => r.VirtualMachineAdapter!.ScriptFragments!.OnBegin?.FragmentName == "Fragment_0" &&
             r.VirtualMachineAdapter.Scripts.Single().Properties.OfType<IScriptObjectPropertyGetter>().Single().Object.FormKey ==

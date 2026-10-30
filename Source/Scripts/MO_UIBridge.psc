@@ -6,3 +6,7 @@ EndFunction
 Int Function EditQuantity(Int aiValue, Int aiMinimum, Int aiMaximum)
     Return -2
 EndFunction
+
+Bool Function ConfirmOrder(String asTitle, String[] asDetails)
+    Return False
+EndFunction

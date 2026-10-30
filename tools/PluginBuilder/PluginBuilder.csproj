@@ -13,5 +13,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="../../tests/record-layout.json" LogicalName="RecordLayout.json" />
+    <EmbeddedResource Include="../../tests/order-field-layout.json" LogicalName="OrderFields.json" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.1",
   "quantityChoices": [10, 25, 50],
   "items": [
     { "editorId": "IngotIron", "name": "Iron Ingots", "unitPrice": 12, "capacityPerDay": 15 },

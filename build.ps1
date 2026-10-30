@@ -26,7 +26,9 @@ $scriptsRoot = Join-Path $dataRoot 'Scripts'
 New-Item -ItemType Directory -Force -Path $scriptsRoot | Out-Null
 & dotnet run --project (Join-Path $projectRoot 'tools\PluginBuilder') -- $master $dataRoot $sourceRoot (Join-Path $projectRoot 'catalogs\materials.json')
 if ($LASTEXITCODE -ne 0) { throw 'Plugin generation or binary validation failed.' }
-$scriptNames = @('MO_OrderManager', 'MO_OrderDialogue', 'MO_Catalog', 'MO_UIBridge', 'MO_ShipmentReceipt')
+$generatedCatalog = Join-Path $sourceRoot 'MO_Catalog.psc'
+[IO.File]::WriteAllText($generatedCatalog, [IO.File]::ReadAllText($generatedCatalog).TrimEnd() + "`n", [Text.UTF8Encoding]::new($false))
+$scriptNames = @('MO_OrderManager', 'MO_OrderDialogue', 'MO_Catalog', 'MO_UIBridge', 'MO_ShipmentReceipt', 'MO_StockBridge')
 foreach ($scriptName in $scriptNames) {
     # Remove only this build's known outputs so stale PEX files cannot pass.
     $compiled = Join-Path $scriptsRoot "$scriptName.pex"
@@ -45,18 +47,38 @@ foreach ($scriptName in $scriptNames) {
 
 
 $uiSource = Join-Path $projectRoot 'Source\UI'
+$stockApi = Join-Path $projectRoot '.tools\stock-api'
+New-Item -ItemType Directory -Force -Path $stockApi | Out-Null
+Get-ChildItem -LiteralPath $apiRoot -Filter '*.psc' | ForEach-Object {
+    Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $stockApi $_.Name) -Force
+}
+Get-ChildItem -LiteralPath (Join-Path $projectRoot 'tools\stock-api') -Filter '*.psc' | ForEach-Object {
+    Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $stockApi $_.Name) -Force
+}
+Get-ChildItem -LiteralPath (Join-Path $projectRoot 'tools\stock-api') -Filter '*.additions' | ForEach-Object {
+    $destination = Join-Path $stockApi ($_.BaseName + '.psc')
+    $existing = Get-Content -LiteralPath $destination -Raw
+    foreach ($line in Get-Content -LiteralPath $_.FullName) {
+        $signature = [regex]::Match($line, '\bFunction\s+(\w+)\s*\(')
+        if ($signature.Success -and $existing -match ('\bFunction\s+' + [regex]::Escape($signature.Groups[1].Value) + '\s*\(')) {
+            continue
+        }
+        Add-Content -LiteralPath $destination -Value $line
+        $existing += "`n" + $line
+    }
+}
 $uiApi = Join-Path $projectRoot 'tools\ui-api'
 $uiOutput = Join-Path $projectRoot 'build\UI\Scripts'
 New-Item -ItemType Directory -Force -Path $uiOutput | Out-Null
-foreach ($scriptName in @('MO_UiExtensionsBridge', 'MO_Config')) {
+foreach ($scriptName in @('MO_UiExtensionsBridge', 'MO_Config', 'MO_DynamicStock')) {
     $compiled = Join-Path $uiOutput "$scriptName.pex"
     if (Test-Path -LiteralPath $compiled) { Remove-Item -LiteralPath $compiled }
-    & $Compiler --game skyrim --import $apiRoot --import $uiApi --import $sourceRoot --import $uiSource --flags $FlagsFile --output $uiOutput (Join-Path $uiSource "$scriptName.psc")
+    & $Compiler --game skyrim --import $stockApi --import $uiApi --import $sourceRoot --import $uiSource --flags $FlagsFile --output $uiOutput (Join-Path $uiSource "$scriptName.psc")
     if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $compiled)) { throw "UI addon compile failed: $scriptName" }
 }
 $dist = Join-Path $projectRoot 'dist'
 New-Item -ItemType Directory -Force -Path $dist | Out-Null
-$zipPath = Join-Path $dist 'MerchantOrders-0.3.0-prototype.zip'
+$zipPath = Join-Path $dist 'MerchantOrders-0.4.1-prototype.zip'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 # Package an explicit allowlist; never include tools, API declarations, or game assets.
 $entries = [ordered]@{
@@ -72,6 +94,8 @@ $entries = [ordered]@{
     'Scripts/MO_ShipmentReceipt.pex' = (Join-Path $scriptsRoot 'MO_ShipmentReceipt.pex')
     'Source/Scripts/MO_UIBridge.psc' = (Join-Path $sourceRoot 'MO_UIBridge.psc')
     'Source/Scripts/MO_ShipmentReceipt.psc' = (Join-Path $sourceRoot 'MO_ShipmentReceipt.psc')
+    'Scripts/MO_StockBridge.pex' = (Join-Path $scriptsRoot 'MO_StockBridge.pex')
+    'Source/Scripts/MO_StockBridge.psc' = (Join-Path $sourceRoot 'MO_StockBridge.psc')
     'MerchantOrders-README.md' = (Join-Path $projectRoot 'docs\INSTALL.md')
 }
 $tempZipPath = "$zipPath.tmp"
@@ -89,7 +113,7 @@ try {
         if ($entry.Length -eq 0) { throw "Empty packaged file: $($entry.FullName)" }
     }
 } finally { $check.Dispose() }
-$uiZip = Join-Path $dist 'MerchantOrders-UI-0.3.0.zip'
+$uiZip = Join-Path $dist 'MerchantOrders-UI-0.4.1.zip'
 $uiEntries = [ordered]@{
     'MerchantOrders-UI.esp' = (Join-Path $dataRoot 'MerchantOrders-UI.esp')
     'Seq/MerchantOrders-UI.seq' = (Join-Path $dataRoot 'Seq\MerchantOrders-UI.seq')
@@ -97,6 +121,8 @@ $uiEntries = [ordered]@{
     'Scripts/MO_Config.pex' = (Join-Path $uiOutput 'MO_Config.pex')
     'Source/Scripts/MO_UiExtensionsBridge.psc' = (Join-Path $uiSource 'MO_UiExtensionsBridge.psc')
     'Source/Scripts/MO_Config.psc' = (Join-Path $uiSource 'MO_Config.psc')
+    'Scripts/MO_DynamicStock.pex' = (Join-Path $uiOutput 'MO_DynamicStock.pex')
+    'Source/Scripts/MO_DynamicStock.psc' = (Join-Path $uiSource 'MO_DynamicStock.psc')
     'MerchantOrders-UI-README.md' = (Join-Path $projectRoot 'docs\UI.md')
 }
 $uiTemp = "$uiZip.tmp"

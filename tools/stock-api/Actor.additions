@@ -1,0 +1,3 @@
+Faction[] Function GetFactions(Int minRank, Int maxRank) Native
+ActorBase Function GetActorBase() Native
+Bool Function IsInFaction(Faction akFaction) Native

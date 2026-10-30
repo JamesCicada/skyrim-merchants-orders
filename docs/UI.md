@@ -1,25 +1,26 @@
-# Merchant Orders enhanced UI 0.3.0
+# Enhanced UI and dynamic catalogs - 0.4.1 development build
 
-Requires the matching Merchant Orders core, SKSE matching your game runtime, SkyUI SE, and UIExtensions SE.
+Install the matching 0.4.1 core plus this addon. Dependencies:
+- SKSE matching your runtime: https://skse.silverlock.org/
+- SkyUI SE: https://www.nexusmods.com/skyrimspecialedition/mods/12604
+- UIExtensions SE: https://www.nexusmods.com/skyrimspecialedition/mods/17561
 
-Dependency pages:
-- https://skse.silverlock.org/
-- https://www.nexusmods.com/skyrimspecialedition/mods/12604
-- https://www.nexusmods.com/skyrimspecialedition/mods/17561
+Enable MerchantOrders.esp before MerchantOrders-UI.esp and launch through SKSE.
 
-Install dependencies through MO2/Vortex, then the core ZIP and MerchantOrders-UI-0.3.0.zip. Enable MerchantOrders.esp before MerchantOrders-UI.esp and launch through SKSE. The addon ESP depends on the core. No third-party files are bundled.
+The addon now includes three scripts: MO_UiExtensionsBridge, MO_Config, and MO_DynamicStock. Deploy all three with the matching ESP/SEQ.
 
-Adds:
-- Scrollable order-action, material, delivery, and settings lists.
-- Direct quantity entry, validated as a whole number from 1 to 500.
-- A Merchant Orders MCM with default-quantity and lead-time sliders.
+Features:
+- Stock-driven common-material and food catalogs.
+- More merchants/innkeepers discovered through standard vendor factions and chests.
+- Scrollable item/action menus, direct quantity entry, and itemized dynamic quotes.
+- MCM sliders for quantity and waiting defaults.
 
-The first list row is Back; Escape cancels. The quantity input starts with your default quantity. The final quote remains a native confirmation box showing materials, 5% delivery fee if chosen, total, and sourcing time.
+The initial stock quest enables dynamic dialogue after startup. The original UI quest stays at local ID 800; the new stock quest is 801 and both are included in the SEQ.
 
-MCM appears through SkyUI's normal registration process. Its lead-time slider ranges from 0.25x to 4x in quarter steps. Paid orders are never recalculated.
+The top list row returns Back, and Escape cancels. In a dynamic quote, informational rows cannot charge gold; only Pay and confirm accepts the order.
 
-Without this addon, core quantity/settings menus work using vanilla message boxes. Core scripts import no UIExtensions/SkyUI/SKSE API; integration scripts are isolated in this addon. Do not install it without dependencies.
+Core-only mode keeps the previous fixed catalogs and basic menus. Extra materials need an explicit MO_CommonMaterials patch to avoid introducing rare goods. Mod-added ordinary food can qualify by its food flag, subject to the stock and exclusion rules.
 
-Implementation follows the author-maintained UIExtensions and SkyUI scripting APIs. UIExtensions list selection uses the callback result, rather than its header-offset row ID, to avoid selecting the wrong action.
+Stock changes after restocking. Sold-out food can disappear, and uninitialized chests may need one normal trade interaction before ordering. A scan is limited to 120 eligible entries from up to 2,048 forms.
 
-The author reports the current version working in game as of 30 October 2026. All addon scripts compile and plugin/package checks pass. A separate exhaustive UI/runtime compatibility matrix has not been established.
+No dependencies or game assets are bundled. All nine authored scripts compile; dynamic-mode gameplay is not yet tested. See docs/DYNAMIC_CATALOGS.md in the repository for full policy and upgrade details.

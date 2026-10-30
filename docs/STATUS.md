@@ -1,5 +1,35 @@
 # Development status
 
+## 0.4.1 vendor detection hotfix
+
+Confirmed cause from Skyrim.esm and SKSE's native implementation: the script checked 0x1000 rather than the actual Vendor flag 0x4000. Anoriath and Carlotta have 0xC000 flags; Belethor's active service faction is also 0xC000. The old test rejected all three.
+
+The flag is now generated from the record schema. Faction enumeration only includes nonnegative ranks and checks current actor membership before considering the chest.
+
+Regressions reproduce the old rejection and validate a unique active chest for all three reported NPCs plus Orgnar. Every 0.4.0 core record ID and all 33 saved fields/properties are preserved. Nine scripts compile and both packages validate. Runtime confirmation is pending.
+
+Install matching core/addon 0.4.1 archives together; do not reset the quest or paid order.
+
+
+## 0.4.0 dynamic stock - local development
+
+Implemented a SKSE stock provider in the enhanced addon, a vanilla-only core interface, addon-gated generic merchant dialogue, and a new addon startup quest. Eligible catalogs come from a vendor chest: six common materials plus food-flagged ordinary ingestibles. Price/value and explicit exclusion rules keep rare goods/drugs/equipment out.
+
+Food and mod-added forms use a new Form snapshot. The old MiscObject field remains unchanged. Name and vendor-chest snapshots support status, pickup, refund, and courier fulfillment.
+
+Verified:
+- Nine authored scripts compile (six core, three addon).
+- Both plugin readbacks and archive allowlists pass.
+- Every 0.3.0 core record ID is preserved.
+- All 29 original manager fields/properties keep their names and types.
+- Horker Stew passes without a keyword list; Skooma is rejected despite VendorItemFood.
+- Gold/ebony ingots and equipment remain excluded.
+- Orgnar has a discoverable vendor chest.
+- Dynamic dialogue is disabled in the core until the addon bootstrap enables it.
+
+Not observed in game: dynamic stock discovery, food ordering/fulfillment, new merchant dialogue, and upgrade startup. The 0.3.0 author test below does not apply to these new paths. This build has not been pushed or released.
+
+
 ## Author smoke test - 30 October 2026
 
 The author reports that the current 0.3.0 version works in game. Couriers can sometimes arrive late; this is accepted behavior and is documented as delay beyond the sourcing estimate.

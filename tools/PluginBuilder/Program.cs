@@ -38,7 +38,7 @@ int LeadDays(int quantity) => (quantity + 14) / 15;
 
 var mod = new SkyrimMod(ModKey.FromNameAndExtension("MerchantOrders.esp"), SkyrimRelease.SkyrimSE);
 mod.ModHeader.Author = "Merchant Orders";
-mod.ModHeader.Description = "Merchant Orders 0.3.0 prototype: common material orders from city merchants.";
+mod.ModHeader.Description = "Merchant Orders 0.4.1 prototype: common material orders from city merchants.";
 var quest = new Quest(mod, "MO_OrderQuest") {
     Name = "Merchant Orders", Priority = 30, QuestFormVersion = 65,
     Flags = Quest.Flag.StartGameEnabled,
@@ -144,7 +144,11 @@ for (int index = 0; index < orderResponses.Length; index++) {
 }
 var expansion = CatalogExpansion.Add(mod, master, quest, topic, args[2], args[3]);
 var features = OrderFeatures.Add(mod, master, quest, args[2], expansion);
-expansion = expansion with { AddedMessages = expansion.AddedMessages + features.AddedMessages };
+var stock = StockFeatures.AddCore(mod, master, quest, topic, expansion, args[2]);
+expansion = expansion with {
+    AddedMessages = expansion.AddedMessages + features.AddedMessages + stock.AddedMessages,
+    AddedResponses = expansion.AddedResponses + stock.AddedResponses
+};
 Directory.CreateDirectory(output);
 string pluginPath = Path.Combine(output, mod.ModKey.FileName);
 mod.WriteToBinary(pluginPath);
@@ -162,11 +166,11 @@ Require(read.Quests.Count == 1 && read.Messages.Count == 10 + expansion.AddedMes
 Require(read.EnumerateMajorRecords().All(r => r.FormKey.ModKey == mod.ModKey), "All records are additive; no vanilla overrides");
 Require(read.Quests.Single().Flags.HasFlag(Quest.Flag.StartGameEnabled), "Quest starts with game");
 using var layoutStream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("RecordLayout.json")
-        ?? throw new InvalidDataException("Missing 0.2.1 record baseline");
+        ?? throw new InvalidDataException("Missing 0.4.0 record baseline");
 var oldLayout = JsonSerializer.Deserialize<Dictionary<string, uint>>(layoutStream)!;
 var newLayout = read.EnumerateMajorRecords().ToDictionary(r => r.EditorID!, r => r.FormKey.ID);
 Require(oldLayout.All(entry => newLayout.TryGetValue(entry.Key, out var id) && id == entry.Value),
-    "All 0.2.1 record IDs preserved for existing-save references");
+    "All 0.4.0 record IDs preserved for existing-save references");
 var bound = read.Quests.Single().VirtualMachineAdapter!.Scripts.Single();
 Require(bound.Name == "MO_OrderManager" && bound.Properties.Count == 13, "All manager properties serialized");
 Require(bound.Properties.OfType<IScriptObjectPropertyGetter>().All(p => p.Alias == -1 && !p.Object.IsNull), "Object bindings are explicit forms");
@@ -199,6 +203,7 @@ Require(voiced.All(r => r.Flags!.Flags.HasFlag(DialogResponses.Flag.Random) &&
     "Three-response random group retains vanilla lip sync");
 CatalogExpansion.Validate(read, expansion);
 OrderFeatures.Validate(read, features);
+StockFeatures.Validate(read, master, stock, expansion);
 Require(read.DialogBranches.Single().StartingTopic.FormKey == read.DialogTopics.Single().FormKey,
     "Top-level branch points to order topic");
 Require(read.Messages.All(m => m.Flags.HasFlag(Mutagen.Bethesda.Skyrim.Message.Flag.MessageBox) && m.MenuButtons.Count > 0),
@@ -217,7 +222,7 @@ Require(BinaryPrimitives.ReadUInt32LittleEndian(File.ReadAllBytes(Path.Combine(o
     "Start-game quest SEQ matches plugin-local FormID");
 
 File.WriteAllText(Path.Combine(output, "..", "build-report.json"), JsonSerializer.Serialize(new {
-    version = "0.3.0-prototype", master = masterPath,
+    version = "0.4.1-prototype", master = masterPath,
     bindings = new { merchant = merchant.FormKey.ToString(), merchantReference = merchantRef.FormKey.ToString(),
         iron = iron.FormKey.ToString(), gold = gold.FormKey.ToString(), quest = quest.FormKey.ToString(), vendorChest = vendorChest.FormKey.ToString() },
     merchantCatalogs = expansion.Merchants, materials = expansion.Spec.Items,

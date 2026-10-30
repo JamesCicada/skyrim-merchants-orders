@@ -110,13 +110,13 @@ EndFunction
         Check(Fee(0) == 0 && Fee(1) == 1 && Fee(19) == 1 && Fee(20) == 1 &&
             Fee(21) == 2 && Fee(600) == 30 && Fee(12500) == 625,
             "5% courier fees round up correctly at whole-gold boundaries");
-        Check(Enumerable.Range(1, 12500).All(n => Fee(n) * 20 >= n && (Fee(n) - 1) * 20 < n),
+        Check(Enumerable.Range(1, 100000).All(n => Fee(n) * 20 >= n && (Fee(n) - 1) * 20 < n),
             "Courier fee rounding holds across every supported subtotal");
     }
     internal static void BuildUiAddon(string output, FormKey managerQuest) {
         var addon = new SkyrimMod(ModKey.FromNameAndExtension("MerchantOrders-UI.esp"), SkyrimRelease.SkyrimSE);
         addon.ModHeader.Author = "Merchant Orders";
-        addon.ModHeader.Description = "Optional UIExtensions order menus and SkyUI MCM. Requires SKSE, SkyUI, UIExtensions, and MerchantOrders.";
+        addon.ModHeader.Description = "Optional dynamic merchant stock, UIExtensions order menus, and SkyUI MCM. Requires SKSE, SkyUI, UIExtensions, and MerchantOrders.";
         var quest = new Quest(addon, "MO_EnhancedUI") {
             Name = "Merchant Orders UI", Flags = Quest.Flag.StartGameEnabled,
             Priority = 10, QuestFormVersion = 65, NextAliasID = 0,
@@ -130,14 +130,23 @@ EndFunction
         manager.Object.SetTo(managerQuest);
         config.Properties.Add(manager);
         quest.VirtualMachineAdapter.Scripts.Add(config);
+        var stockQuest = new Quest(addon, "MO_DynamicStock") {
+            Name = "Merchant Orders Dynamic Stock", Flags = Quest.Flag.StartGameEnabled,
+            Priority = 10, QuestFormVersion = 65, NextAliasID = 0,
+            VirtualMachineAdapter = new QuestAdapter { Version = 5, ObjectFormat = 2, ExtraBindDataVersion = 2 }
+        };
+        addon.Quests.Add(stockQuest);
+        if (stockQuest.FormKey.ID != 0x801) throw new InvalidDataException("Stock bridge must keep local ID 801");
+        stockQuest.VirtualMachineAdapter.Scripts.Add(new ScriptEntry { Name = "MO_DynamicStock" });
         string path = Path.Combine(output, "MerchantOrders-UI.esp");
         addon.WriteToBinary(path);
         using var read = SkyrimMod.CreateFromBinaryOverlay(new ModPath(addon.ModKey, path), SkyrimRelease.SkyrimSE);
-        if (read.Quests.Count != 1 || read.Quests.Single().VirtualMachineAdapter!.Scripts.Count != 2 ||
+        if (read.Quests.Count != 2 || read.Quests.Single(q => q.EditorID == "MO_EnhancedUI").VirtualMachineAdapter!.Scripts.Count != 2 ||
             !read.ModHeader.MasterReferences.Any(m => m.Master == managerQuest.ModKey))
             throw new InvalidDataException("UI addon failed binary validation.");
-        byte[] seq = new byte[4];
-        BinaryPrimitives.WriteUInt32LittleEndian(seq, ((uint)read.ModHeader.MasterReferences.Count << 24) | quest.FormKey.ID);
+        byte[] seq = new byte[8];
+        BinaryPrimitives.WriteUInt32LittleEndian(seq.AsSpan(0, 4), ((uint)read.ModHeader.MasterReferences.Count << 24) | quest.FormKey.ID);
+        BinaryPrimitives.WriteUInt32LittleEndian(seq.AsSpan(4, 4), ((uint)read.ModHeader.MasterReferences.Count << 24) | stockQuest.FormKey.ID);
         Directory.CreateDirectory(Path.Combine(output, "Seq"));
         File.WriteAllBytes(Path.Combine(output, "Seq", "MerchantOrders-UI.seq"), seq);
         Console.WriteLine("PASS Optional UI addon links to core manager and starts its MCM/bridge quest");

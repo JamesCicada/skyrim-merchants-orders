@@ -9,7 +9,9 @@ Int Function ShowList(String asTitle, String[] asEntries)
     menu.AddEntryItem(asTitle + " - Back", -1, -1)
     Int i = 0
     While i < asEntries.Length
-        menu.AddEntryItem(asEntries[i], -1, i)
+        If asEntries[i] != ""
+            menu.AddEntryItem(asEntries[i], -1, i)
+        EndIf
         i += 1
     EndWhile
     If menu.OpenMenu() != 1
@@ -49,4 +51,35 @@ Int Function EditQuantity(Int aiValue, Int aiMinimum, Int aiMaximum)
         Return -1
     EndIf
     Return result
+EndFunction
+
+Bool Function ConfirmOrder(String asTitle, String[] asDetails)
+    Int attempts = 0
+    While attempts < 20
+        UIListMenu menu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
+        If menu == None
+            Return False
+        EndIf
+        menu.SetPropertyBool("sort", False)
+        menu.AddEntryItem(asTitle, -1, -2)
+        Int i = 0
+        While i < asDetails.Length
+            menu.AddEntryItem(asDetails[i], -1, -2)
+            i += 1
+        EndWhile
+        menu.AddEntryItem("Pay and confirm", -1, 0)
+        menu.AddEntryItem("Cancel", -1, 1)
+        If menu.OpenMenu() != 1
+            Return False
+        EndIf
+        Int selection = menu.GetResultFloat() as Int
+        If selection == 0
+            Return True
+        ElseIf selection != -2
+            Return False
+        EndIf
+        ; Selecting an informational row cannot charge the player.
+        attempts += 1
+    EndWhile
+    Return False
 EndFunction

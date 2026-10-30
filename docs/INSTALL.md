@@ -1,7 +1,27 @@
-# Merchant Orders 0.3.0
+# Merchant Orders 0.4.1 - development build
 
 Material orders from eleven merchants in the five major cities. Six common materials only: iron ingots, steel ingots, iron ore, leather, leather strips, and firewood.
 
+## 0.4.1 vendor-detection hotfix
+
+Fixed the rejection of Anoriath, Carlotta Valentia, Belethor, and other valid vendors. The 0.4.0 script tested 0x1000; the actual vendor bit in the game records is 0x4000. The generator now derives this flag from the record schema. Discovery also ignores negative-rank/removed factions.
+
+Install BOTH matching 0.4.1 core and enhanced addon packages after quitting Skyrim, then reload the same save. No order/quest reset is needed. Existing order fields and 0.4.0 record IDs are preserved. Do not update only the addon: its corrected resolver calls a new generated core helper.
+
+Regression checks reproduce the old rejection and resolve one vendor chest each for Anoriath, Carlotta, Belethor, and Orgnar. All nine scripts compile. The hotfix has not yet been confirmed in game.
+## New in 0.4.0: stock-driven materials and food
+
+With the enhanced addon, eligible orders now come from the merchant's current trade inventory. Innkeepers such as Orgnar can offer food they actually stock. Ordinary food/drink is admitted by its food flag; poisons, hostile consumables, known special/drug items, and high-value consumables are excluded. Materials remain limited to the six approved common forms.
+
+Stock changes after restocking or normal trading can change the catalog. Horker Stew qualifies when stocked; it is not forcibly added to every innkeeper. Mod-added normal food can qualify, while extra materials need an allowlist patch.
+
+Food prices are 150% of base value, rounded up (minimum one gold); food sources at 25 units/day before your multiplier. Existing material prices stay the same. The courier fee remains 5%.
+
+Dynamic mode requires the enhanced addon and its SKSE/SkyUI/UIExtensions dependencies. Install both matching 0.4.1 packages. The addon now includes MO_DynamicStock.pex in addition to its prior two scripts. A new startup quest enables the mode without resetting paid orders.
+
+Core-only mode still uses the eleven merchants and six material catalogs below. The new dynamic feature is not yet tested in game; the author's successful test report applies to 0.3.0.
+
+See DYNAMIC_CATALOGS.md in the source repository for stock limits, compatibility, and save preservation.
 ## Delivery choice
 
 After selecting an item and quantity, choose:
@@ -30,22 +50,23 @@ Settings only affect new orders. An accepted order keeps its item, quantity, tot
 
 ## Core installation/update
 
-Exit dialogue, save, and quit Skyrim. Install MerchantOrders-0.3.0-prototype.zip through MO2/Vortex, replacing the prior core package. Keep MerchantOrders.esp enabled.
+Exit dialogue, save, and quit Skyrim. Install MerchantOrders-0.4.1-prototype.zip through MO2/Vortex, replacing the prior core package. Keep MerchantOrders.esp enabled.
 
-Deploy all FIVE core PEX scripts together:
+Deploy all SIX core PEX scripts together:
 - MO_OrderManager
 - MO_OrderDialogue
 - MO_Catalog
 - MO_UIBridge
 - MO_ShipmentReceipt
+- MO_StockBridge
 
-Existing pickup orders keep their original terms. All released 0.2.1 form IDs and old persistent fields are preserved. No quest reset is needed.
+Existing pickup orders keep their original terms. All released 0.3.0 form IDs and old persistent fields are preserved. No quest reset is needed.
 
 The core only requires Skyrim.esm and installed vanilla game scripts. It does not require SKSE, SkyUI, or UIExtensions.
 
 ## Optional enhanced UI
 
-Install the matching MerchantOrders-UI-0.3.0.zip after the core, with:
+Install the matching MerchantOrders-UI-0.4.1.zip after the core, with:
 - SKSE matching your Skyrim runtime: https://skse.silverlock.org/
 - SkyUI SE: https://www.nexusmods.com/skyrimspecialedition/mods/12604
 - UIExtensions SE: https://www.nexusmods.com/skyrimspecialedition/mods/17561
@@ -70,8 +91,8 @@ One outstanding order is allowed globally, including dispatched courier shipment
 
 ## Validation and periodic tests
 
-Author-tested in game on 30 October 2026. The author reports the current version working and notes that couriers can sometimes arrive late. All seven scripts compile; both plugins, prior record IDs, and fee rounding pass build checks. This does not establish every edge case or load-order combination.
+Released 0.3.0 was author-tested on 30 October 2026, with occasional courier delays. This 0.4.0 stock-driven development build is not yet tested in game. Nine scripts compile, both plugins and prior saved-field/record compatibility checks pass, and food/rare-item rules are checked.
 
-For your next periodic test, cover pickup and courier checkout, a non-default quantity/multiplier, save/load, the courier handoff, and pickup recovery followed by an old receipt arriving. Verify one grant and one fee refund at most. The current version has a general author smoke-test report; no exhaustive per-feature matrix is claimed.
+For your next periodic test, cover pickup and courier checkout, a non-default quantity/multiplier, save/load, the courier handoff, and pickup recovery followed by an old receipt arriving. Verify one grant and one fee refund at most. The earlier author report is not a validation of the new dynamic feature.
 
 There is no merchant-death recovery. Courier overhauls that preserve WICourierScript.AddRefToContainer should remain callable, but compatibility has not been tested. The builder uses vanilla vendor chests; overhauls replacing them need integration.

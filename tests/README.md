@@ -1,18 +1,20 @@
 # Compatibility and feature checks
 
-record-layout.json contains every editor ID/local FormID in the released 0.2.1 ESP. It is embedded in PluginBuilder; new builds must preserve those mappings.
+record-layout.json captures all core editor IDs/local FormIDs from the 0.4.0 test-build ESP.
+order-field-layout.json captures the names/types of its 33 saved fields/properties.
 
-Build checks cover:
-- Six common-material forms, eleven merchants, vendor chests, voice and manager links.
-- Existing record IDs and all original manager properties.
-- Quantity/pricing/lead-time message records.
-- Receipt-to-manager binding and UI-addon-to-manager binding.
-- Itemized delivery quotes and a settings option at each merchant.
-- Exact 5%-rounded-up boundaries and all supported subtotals 1-12500.
-- PEX compilation plus explicit core/addon archive contents.
+Both fixtures are embedded in PluginBuilder and checked on each build. The legacy MiscObject item field is preserved while a new Form snapshot supports food and mod-added goods.
 
-Earlier negative checks rejected an IngotGold substitution and a zero sourcing capacity before output.
+StockFeatures also checks:
+- A disabled-by-default dynamic global and service/addon-gated generic dialogue.
+- No duplicate legacy merchant INFO matches.
+- Only the approved common material forms.
+- Horker Stew's food flag without keywords.
+- Rejection of rare ingots, equipment, and Skooma's misleading VendorItemFood tag.
+- Orgnar's vanilla vendor-container availability.
 
-The UIExtensions author code shows row ID in GetResultInt and callback in GetResultFloat; the addon uses the latter to avoid the header-row offset.
+Other checks cover quotes, manager/receipt links, UI addon records, two startup quests in its SEQ, compilation, fee rounding through 100,000 gold, and 15/9 packaged files.
 
-These checks do not execute Skyrim. During periodic tests include courier handoff, receipt replay after pickup recovery, changed settings with an already paid order, and core-only operation without UI dependencies.
+These checks do not run the game. During periodic testing, include Orgnar food selection, restock changes, vendor payments, food pickup/courier grants, an existing paid 0.3.0 order, and cancel/detail rows in dynamic confirmation.
+
+Vendor regression: Anoriath, Carlotta Valentia, Belethor, and Orgnar each have one active vendor chest under mask 0x4000, and none under the erroneous 0x1000 check. The runtime flag is generated from the schema rather than hardcoded in Papyrus.

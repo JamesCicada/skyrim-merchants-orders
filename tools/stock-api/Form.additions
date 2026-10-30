@@ -1,0 +1,2 @@
+String Function GetName() Native
+Int Function GetGoldValue() Native

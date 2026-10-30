@@ -1,55 +1,54 @@
-# Building Merchant Orders
+# Building Merchant Orders 0.4.1
 
 Requires .NET SDK 8+, Caprica 0.3.0, and a local Skyrim.esm. Mutagen.Bethesda.Skyrim 0.53.1 is pinned.
 
     .\build.ps1 -SkyrimData 'D:\Games\Skyrim Anniversary Edition\Data'
 
-Caprica upstream: https://github.com/Orvid/Caprica/releases/tag/v0.3.0
-Extract it to .tools/caprica/ or pass -Compiler.
+Caprica: https://github.com/Orvid/Caprica/releases/tag/v0.3.0
+Extract to .tools/caprica/ or pass -Compiler.
 
-## Outputs
+Outputs:
+- dist/MerchantOrders-0.4.1-prototype.zip: core, 15 files.
+- dist/MerchantOrders-UI-0.4.1.zip: dynamic/enhanced addon, 9 files.
 
-- dist/MerchantOrders-0.3.0-prototype.zip: dependency-free core, 13 files.
-- dist/MerchantOrders-UI-0.3.0.zip: optional UI addon, 7 files.
+No game installation, plugins list, saves, or public release is modified by the build.
 
-The build does not deploy files, change plugins lists, or edit saves.
+## Records and sources
 
-## Pipeline
+CatalogExpansion retains the six-material/eleven-merchant fallback and all original record allocations. OrderFeatures appends delivery/settings records. StockFeatures appends the dynamic enable global (default zero), material/food policy FormLists, a generic menu, and the generic merchant INFO.
 
-Read catalogs/materials.json and resolve six materials, eleven merchants, their references, voices, and vendor chests from Skyrim.esm. Reject rare-form substitutions or invalid configuration.
+StockFeatures verifies the 0.3.0 saved-field fixture before output. The binary validator preserves every released 0.3.0 core form ID. New fields are appended rather than changing the saved MiscObject item type.
 
-Generate the core ESP/SEQ and MO_Catalog.psc. Original record allocations happen first; all released 0.2.1 IDs are checked against tests/record-layout.json. Add feature records only afterward.
+The addon keeps its existing UI/MCM quest at ID 800 and adds the stock bootstrap at 801. Both are start-game enabled and included in its SEQ. No vanilla NPC, merchant, or courier record is overridden.
 
-OrderFeatures adds settings/delivery messages and a scripted receipt Book. Its receipt property points to the existing order manager. WICourier is verified from the master; its AddRefToContainer(ObjectReference) API was verified by inspecting the installed vanilla bytecode locally. No decompiled vanilla script or game asset is distributed.
+MO_Catalog.psc is generated; do not edit it manually. materials.json now describes the core-only fallback and the dynamic common-material allowlist. It is not a runtime JSON loader.
 
-Generate a separate MerchantOrders-UI.esp with a start-game-enabled quest holding the UI bridge and MCM scripts. It links to the core manager; core records are not overridden. Both plugins are reopened and checked.
+## API separation
 
-Compile five core scripts using only tools/api and Source/Scripts. Compile two addon scripts separately with tools/ui-api and Source/UI. Only the addon sees UIExtensions, SkyUI, and SKSE interfaces. Core's MO_UIBridge is an authored vanilla-only contract.
+Core compiles six scripts against authored vanilla interfaces in tools/api.
 
-Package exact file allowlists. Dependency implementations, interfaces, tools, game assets, and external audio are excluded. Core PEX headers/game IDs and package entry counts are checked.
+For the addon, the build copies those interfaces into .tools/stock-api, appends authored SKSE signatures from tools/stock-api/*.additions, and adds its SKSE-only class interfaces. Existing declarations are not appended twice when using fuller source sets. The addon compiles three scripts using that merged folder plus tools/ui-api.
 
-## Configuration
+No imported interface, dependency implementation, game asset, or extracted audio is packaged. Runtime dependencies are required only by the enhanced/dynamic addon.
 
-materials.json defines allowed material prices/capacity and merchant specialties. Its quantityChoices array retains the legacy 10/25/50 quote menus for record compatibility; current quantity entry accepts 1-500 and runtime settings are saved on the quest.
+## Dynamic policies
 
-New orders use the saved lead-time multiplier. Accepted orders store the due day; changing settings does not change that deadline. Fee calculation is ceil(subtotal / 20), equivalent to 5% rounded up.
+The addon reads current vendor-container inventory with SKSE. It does not inspect actor pockets or reconstruct all historical/restock possibilities.
 
-MO_Catalog.psc is generated on every build. Do not edit it by hand.
+Common materials are allowlisted. Food uses the engine food flag, poison/hostile exclusion, explicit special-item exclusions, and a 100-gold base-value cap. Mod-added ordinary food can qualify; extra materials require an explicit patch.
 
-## Compile-only APIs
+Existing common-material prices/capacities stay configured. Food uses ceil(1.5 * base value), minimum one gold, with capacity 25/day. Quantity and waiting settings are applied to the quote, then stored with the accepted order.
 
-tools/api contains authored vanilla interfaces. WICourierScript is an interface only, never a replacement to install. tools/ui-api contains authored subsets of author-maintained dependency APIs. Nothing in either folder is compiled as shipped output.
+The scan limits are 2,048 forms and 120 eligible products. UI lists skip empty array slots. Only the explicit Pay and confirm callback charges; informational quote rows do not.
 
-For a second compile against complete CK sources:
+## Validation scope
 
-    .\build.ps1 -SkyrimData 'PATH_TO_DATA' -VanillaSources 'PATH_TO_COMPLETE_CK_SOURCES' -FlagsFile 'PATH_TO_TESV_FLAGS'
+Build checks cover compilation, form/script/voice links, addon startup, prior record IDs, saved field types, material restrictions, Horker Stew qualification, misleading food keywords, vendor-container discovery, fee rounding through 100,000 gold, and archive entry allowlists.
 
-The compiler option expects Caprica CLI syntax.
+These checks do not execute Skyrim inventory, food delivery, menu, or save-upgrade behavior. The new dynamic paths are untested in game. The author-tested release remains 0.3.0.
 
-## Validation limits
+For a second compile against complete CK sources, -VanillaSources and -FlagsFile remain available. Compiler CLI syntax is Caprica's.
 
-Build checks verify form links, menus, amount/fee fields, merchant restrictions, record-ID compatibility, and fee rounding across every supported subtotal. They do not run Skyrim's courier, inventory, MCM, or UI events.
+Mutagen is GPL-3.0-only and Caprica is MIT; their tool binaries are not bundled. Choose a project license before public distribution.
 
-The author reported the current 0.3.0 version working in game on 30 October 2026, with occasional courier delays. This is a general smoke-test report rather than an exhaustive per-feature or cross-runtime test matrix.
-
-Mutagen is GPL-3.0-only; Caprica is MIT. Tool binaries are not bundled. Choose a project license before public distribution.
+0.4.1 derives the Vendor bit from the record schema (0x4000) and checks the three reported Whiterun vendors plus Orgnar against the obsolete 0x1000 failure. The baseline fixtures now preserve all 0.4.0 core records and 33 saved fields/properties.

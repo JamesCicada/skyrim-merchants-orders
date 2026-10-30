@@ -614,3 +614,24 @@ Int Function CourierFee(Int aiSubtotal) Global
     EndIf
     Return (aiSubtotal + 19) / 20
 EndFunction
+
+; Dynamic-mode records are appended after all 0.3.0 forms.
+GlobalVariable Function DynamicOrdersEnabled() Global
+    Return (Game.GetFormFromFile(0x00000849, "MerchantOrders.esp") as GlobalVariable)
+EndFunction
+
+FormList Function CommonMaterials() Global
+    Return (Game.GetFormFromFile(0x0000084A, "MerchantOrders.esp") as FormList)
+EndFunction
+
+FormList Function ExcludedFood() Global
+    Return (Game.GetFormFromFile(0x0000084B, "MerchantOrders.esp") as FormList)
+EndFunction
+
+Message Function DynamicMainMenu() Global
+    Return (Game.GetFormFromFile(0x0000084C, "MerchantOrders.esp") as Message)
+EndFunction
+
+Int Function VendorFactionFlag() Global
+    Return 16384
+EndFunction
