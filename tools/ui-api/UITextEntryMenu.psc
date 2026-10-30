@@ -1,0 +1,1 @@
+Scriptname UITextEntryMenu extends UIMenuBase

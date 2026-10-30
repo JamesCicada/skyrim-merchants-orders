@@ -1,0 +1,19 @@
+{
+  "formatVersion": 1,
+  "purpose": "Historical iron-only design example. Active build catalog: materials.json",
+  "merchant": "Belethor",
+  "deliveryMethod": "merchant_pickup",
+  "maxOutstandingOrdersForMilestone": 1,
+  "paymentDestination": "Belethor vendor chest, verified against Skyrim.esm",
+  "items": [
+    {
+      "item": "Iron Ingot",
+      "runtimeFormBinding": "Resolved from Skyrim.esm by PluginBuilder",
+      "unitPriceGold": 12,
+      "quantityChoices": [10, 25, 50],
+      "sourcingCapacityPerGameDay": 15,
+      "leadTimeRule": "ceil(quantity / sourcingCapacityPerGameDay)",
+      "leadTimeGameDaysByQuantity": { "10": 1, "25": 2, "50": 4 }
+    }
+  ]
+}

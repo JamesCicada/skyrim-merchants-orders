@@ -1,0 +1,29 @@
+{
+  "version": "0.3.0",
+  "quantityChoices": [10, 25, 50],
+  "items": [
+    { "editorId": "IngotIron", "name": "Iron Ingots", "unitPrice": 12, "capacityPerDay": 15 },
+    { "editorId": "IngotSteel", "name": "Steel Ingots", "unitPrice": 25, "capacityPerDay": 10 },
+    { "editorId": "OreIron", "name": "Iron Ore", "unitPrice": 8, "capacityPerDay": 25 },
+    { "editorId": "Leather01", "name": "Leather", "unitPrice": 10, "capacityPerDay": 20 },
+    { "editorId": "LeatherStrips", "name": "Leather Strips", "unitPrice": 3, "capacityPerDay": 40 },
+    { "editorId": "Firewood01", "name": "Firewood", "unitPrice": 5, "capacityPerDay": 25 }
+  ],
+  "catalogs": {
+    "general": ["IngotIron", "OreIron", "Leather01", "LeatherStrips", "Firewood01"],
+    "blacksmith": ["IngotIron", "IngotSteel", "OreIron", "Leather01", "LeatherStrips"]
+  },
+  "merchants": [
+    { "editorId": "Belethor", "name": "Belethor", "city": "Whiterun", "catalog": "general" },
+    { "editorId": "AdrianneAvenicci", "name": "Adrianne Avenicci", "city": "Whiterun", "catalog": "blacksmith" },
+    { "editorId": "Ulfberth", "name": "Ulfberth War-Bear", "city": "Whiterun", "catalog": "blacksmith" },
+    { "editorId": "Sayma", "name": "Sayma", "city": "Solitude", "catalog": "general" },
+    { "editorId": "Beirand", "name": "Beirand", "city": "Solitude", "catalog": "blacksmith" },
+    { "editorId": "RevynSadri", "name": "Revyn Sadri", "city": "Windhelm", "catalog": "general" },
+    { "editorId": "Oengul", "name": "Oengul War-Anvil", "city": "Windhelm", "catalog": "blacksmith" },
+    { "editorId": "Lisbet", "name": "Lisbet", "city": "Markarth", "catalog": "general" },
+    { "editorId": "GhorzaGraBagol", "name": "Ghorza gra-Bagol", "city": "Markarth", "catalog": "blacksmith" },
+    { "editorId": "Bersi", "name": "Bersi Honey-Hand", "city": "Riften", "catalog": "general" },
+    { "editorId": "Balimund", "name": "Balimund", "city": "Riften", "catalog": "blacksmith" }
+  ]
+}

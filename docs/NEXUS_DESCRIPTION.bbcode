@@ -1,0 +1,107 @@
+[center][size=6][b]Merchant Orders and Deliveries[/b][/size]
+Order common supplies. Pay upfront. Pick them up later, or let a courier bring them to you.
+[/center]
+
+[size=4][b]Make merchants useful beyond their current stock[/b][/size]
+Need materials for your next crafting project? Place an order with a supported merchant instead of visiting several shops or waiting for inventories to refresh.
+
+Choose a common material and quantity, review the price and sourcing time, and pay upfront. Return to the same merchant when the order is ready, or pay a little extra for courier delivery.
+
+[size=4][b]Features[/b][/size]
+[list]
+[*]Eleven supported merchants across Whiterun, Solitude, Windhelm, Markarth, and Riften.
+[*]Common materials only: Iron Ingots, Steel Ingots, Iron Ore, Leather, Leather Strips, and Firewood.
+[*]Separate catalogs for blacksmiths and general merchants.
+[*]Order between 1 and 500 units.
+[*]Quantity-based sourcing times, adjustable from 0.25x to 4x.
+[*]Free merchant pickup or courier delivery for 5% extra.
+[*]Itemized confirmation showing materials, delivery fee, total, and sourcing time.
+[*]Order status showing your item, quantity, merchant, and remaining wait.
+[*]Payments added to the accepting shop's vendor chest.
+[*]Vanilla voiced trade responses.
+[*]Optional enhanced menus and SkyUI MCM.
+[/list]
+
+[size=4][b]How to place an order[/b][/size]
+[list=1]
+[*]Talk to a supported merchant and select "I'd like to place or collect an order."
+[*]Choose a material and quantity.
+[*]Choose merchant pickup or courier delivery.
+[*]Review the full quote and confirm payment.
+[*]Continue adventuring while the materials are sourced.
+[*]Collect from the original merchant, or receive your courier shipment.
+[/list]
+
+One outstanding order is allowed across all merchants. Paid orders keep their original terms when you change settings.
+
+[size=4][b]Courier delivery[/b][/size]
+Courier delivery costs 5% of the materials subtotal, rounded up to whole gold.
+Example: 50 Iron Ingots cost 600 gold, plus a 30-gold courier fee, for 630 gold total.
+
+[b]The quoted wait is the sourcing time, not a guaranteed arrival time.[/b] Once the goods are ready, Skyrim's vanilla courier still needs to find you. The courier can sometimes be late.
+
+If you would rather collect a delayed shipment yourself, return to the original merchant and choose "Collect / resolve delivery." Once sourcing is complete, you can switch to pickup and receive a refund of the delivery fee.
+
+[size=4][b]Supported merchants[/b][/size]
+[b]Whiterun[/b] - Belethor; Adrianne Avenicci; Ulfberth War-Bear
+[b]Solitude[/b] - Sayma; Beirand
+[b]Windhelm[/b] - Revyn Sadri; Oengul War-Anvil
+[b]Markarth[/b] - Lisbet; Ghorza gra-Bagol
+[b]Riften[/b] - Bersi Honey-Hand; Balimund
+
+General merchants offer Iron Ingots, Iron Ore, Leather, Leather Strips, and Firewood.
+Blacksmiths offer Iron Ingots, Steel Ingots, Iron Ore, Leather, and Leather Strips.
+
+No rare metals, gems, soul gems, weapons, armor, enchanted equipment, or unique items are included.
+
+[size=4][b]Requirements[/b][/size]
+[b]Core mod:[/b] Skyrim Special Edition / Anniversary Edition with its vanilla game scripts. The core does not require SKSE, SkyUI, or UIExtensions.
+
+[b]Enhanced UI addon only:[/b]
+[list]
+[*]The matching Merchant Orders core version.
+[*][url=https://skse.silverlock.org/]SKSE matching your installed Skyrim runtime[/url].
+[*][url=https://www.nexusmods.com/skyrimspecialedition/mods/12604]SkyUI SE[/url].
+[*][url=https://www.nexusmods.com/skyrimspecialedition/mods/17561]UIExtensions SE[/url].
+[/list]
+
+The addon adds scrollable menus, direct quantity entry, and MCM sliders for default quantity and lead times. The final payment confirmation remains a native message box. Without the addon, basic menus still provide ordering and settings.
+
+[size=4][b]Installation[/b][/size]
+[list=1]
+[*]Install the main core file with MO2 or Vortex.
+[*]Enable MerchantOrders.esp.
+[*]For enhanced menus, install the three UI dependencies and the matching optional addon.
+[*]Enable MerchantOrders-UI.esp after MerchantOrders.esp and launch through SKSE.
+[/list]
+
+For updates, exit dialogue, save, and quit Skyrim before replacing the files. Update the plugin and all packaged scripts together. Existing paid pickup orders retain their stored terms. Do not reset the order quest.
+
+[size=4][b]Version 0.3.0 - testing and current limits[/b][/size]
+[b]Author-tested in game.[/b] The author reports the mod working, with occasional courier delays. Build checks also cover compilation, plugin links, prior record IDs, archive contents, and fee rounding. This is an early release; it is not a claim of compatibility with every load order or a test of every edge case.
+
+[list]
+[*]One outstanding order globally.
+[*]Courier arrival depends on Skyrim's normal courier behavior.
+[*]No merchant-death recovery.
+[*]No selectable home-delivery destination.
+[*]No rare-material catalogs or automatic mod-added item support.
+[*]Merchant/courier overhauls may need integration; compatibility is not guaranteed.
+[*]Broad runtime and save-upgrade compatibility has not been established.
+[/list]
+
+Please include your version, merchant, item, quantity, delivery choice, load order, and what happened when reporting a problem.
+
+[size=4][b]Support development[/b][/size]
+I'm James Cicada, a solo developer making mods and tools. If you enjoy my work and would like to support future development, you can find me on [url=https://ko-fi.com/jcicada]Ko-fi[/url].
+
+Support is completely optional. Thank you for playing, reporting issues, and helping improve the mod.
+
+[size=4][b]Source and credits[/b][/size]
+[url=https://github.com/JamesCicada/skyrim-merchants-orders]Source code on GitHub[/url]
+
+Bethesda - Skyrim's existing assets, voices, and courier system.
+SKSE team, SkyUI team, and Expired6978 - optional UI dependencies.
+Mutagen and Caprica contributors - development tooling.
+
+No third-party dependency files or extracted game audio are bundled.
