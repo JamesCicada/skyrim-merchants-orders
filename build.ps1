@@ -113,7 +113,7 @@ try {
         if ($entry.Length -eq 0) { throw "Empty packaged file: $($entry.FullName)" }
     }
 } finally { $check.Dispose() }
-$uiZip = Join-Path $dist 'MerchantOrders-UI-0.4.1.zip'
+$uiZip = Join-Path $dist 'MerchantOrdersUI-0.4.1.zip'
 $uiEntries = [ordered]@{
     'MerchantOrders-UI.esp' = (Join-Path $dataRoot 'MerchantOrders-UI.esp')
     'Seq/MerchantOrders-UI.seq' = (Join-Path $dataRoot 'Seq\MerchantOrders-UI.seq')

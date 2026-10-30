@@ -66,7 +66,7 @@ The core only requires Skyrim.esm and installed vanilla game scripts. It does no
 
 ## Optional enhanced UI
 
-Install the matching MerchantOrders-UI-0.4.1.zip after the core, with:
+Install the matching MerchantOrdersUI-0.4.1.zip after the core, with:
 - SKSE matching your Skyrim runtime: https://skse.silverlock.org/
 - SkyUI SE: https://www.nexusmods.com/skyrimspecialedition/mods/12604
 - UIExtensions SE: https://www.nexusmods.com/skyrimspecialedition/mods/17561

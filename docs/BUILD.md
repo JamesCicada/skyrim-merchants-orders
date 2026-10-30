@@ -9,7 +9,7 @@ Extract to .tools/caprica/ or pass -Compiler.
 
 Outputs:
 - dist/MerchantOrders-0.4.1-prototype.zip: core, 15 files.
-- dist/MerchantOrders-UI-0.4.1.zip: dynamic/enhanced addon, 9 files.
+- dist/MerchantOrdersUI-0.4.1.zip: dynamic/enhanced addon, 9 files.
 
 No game installation, plugins list, saves, or public release is modified by the build.
 
